@@ -3,6 +3,9 @@ import pygame
 from level import Level
 
 pygame.init()
+icon = pygame.image.load("icon.ico")
+pygame.display.set_icon(icon)
+
 pygame.display.set_caption('Game')
 screen = pygame.display.set_mode((800, 600))
 clock = pygame.time.Clock()
