@@ -1,3 +1,4 @@
+import json
 import pygame
 from level import Level
 
@@ -6,7 +7,11 @@ pygame.display.set_caption('Game')
 screen = pygame.display.set_mode((800, 600))
 clock = pygame.time.Clock()
 
-level = Level(screen, "level1.json")
+level_name=""
+with open("settings.json", 'r') as file:
+    settings_data = json.load(file)
+    level_name=settings_data["level_file"]
+level = Level(screen, level_name)
 
 running = True
 while running:
@@ -23,7 +28,7 @@ while running:
     level.draw()
 
     if keys[pygame.K_r]:
-        level = Level(screen, "level1.json")
+        level = Level(screen, level_name)
 
         
     if keys[pygame.K_ESCAPE]:

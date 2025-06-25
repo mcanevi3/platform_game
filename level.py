@@ -5,7 +5,7 @@ from player import Player
 class Level:
     def __init__(self, screen, level_file):
         self.screen = screen
-        self.player = Player(100, 400,40,40)
+        
         self.platforms = []
         self.hazards = []
         self.checkpoint = None
@@ -30,7 +30,7 @@ class Level:
     def load_level(self, level_file):
         with open(level_file, 'r') as file:
             level_data = json.load(file)
-        
+
         for plat in level_data["platforms"]:
             platform = pygame.Rect(plat["x"], plat["y"], plat["width"], plat["height"])
             self.platforms.append(platform)
@@ -43,6 +43,10 @@ class Level:
         if checkpoint_data:
             self.checkpoint = pygame.Rect(checkpoint_data["x"], checkpoint_data["y"],
                                           checkpoint_data["width"], checkpoint_data["height"])
+        
+        init_pos=level_data["start"]
+        self.player = Player(init_pos["x"],init_pos["y"],40,40)
+
 
     def update(self, keys):
         if self.completed:
@@ -52,34 +56,44 @@ class Level:
         self.player.update(keys)
 
         player_rect=self.player.get_rect()
-        player_rect=pygame.Rect(player_rect.x+self.player.vx, player_rect.y+self.player.vy, player_rect.width, player_rect.height)
-        
+        player_rect=pygame.Rect(player_rect.x+self.player.vx+self.player.ax/2, player_rect.y+self.player.vy+self.player.ay/2, player_rect.width, player_rect.height)
         
         for platform in self.platforms:
-            
             if player_rect.colliderect(platform):
                 if self.player.vx>0:
                     self.player.ax=0
-                    self.player.vx=0
+                    self.player.vx*=-1
                 elif self.player.vx<0:
                     self.player.ax=0
-                    self.player.vx=0
+                    self.player.vx*=-1
 
                 if self.player.vy>0:
                     self.player.ay=0
-                    self.player.vy=0
+                    self.player.vy*=-1
                 elif self.player.vy<0:
                     self.player.ay=0
-                    self.player.vy=0
+                    self.player.vy*=-1    
                 
         for hazard in self.hazards:
             if player_rect.colliderect(hazard):
-                self.player.decrease_health(33)
+                self.player.decrease_health(19)
 
-                self.text_health = self.font.render(f"{self.player.health}", True, (255, 255, 255))
-                
-                self.player.ax=0
-                self.player.vx=-1
+                if self.player.vx>0:
+                    self.player.ax=0
+                    self.player.vx*=-1
+                elif self.player.vx<0:
+                    self.player.ax=0
+                    self.player.vx*=-1
+
+                if self.player.vy>0:
+                    self.player.ay=0
+                    self.player.vy*=-1
+                elif self.player.vy<0:
+                    self.player.ay=0
+                    self.player.vy*=-1
+
+
+                self.text_health = self.font.render(f"{self.player.health}", True, (255, 255, 255))                
 
         if self.checkpoint and player_rect.colliderect(self.checkpoint):
             self.player.ax=0
